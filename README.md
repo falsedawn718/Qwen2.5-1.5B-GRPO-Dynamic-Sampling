@@ -45,10 +45,10 @@
 
 初始化设置：
 
-- 初始正确率估计：$p_i=0.5$
-- 初始采样计数：$counts_i=0$
-- 生成数量：$G=8$
-- EMA momentum：$m=0.5$
+- 初始正确率估计：p_i=0.5
+- 初始采样计数：counts_i=0
+- 生成数量：G=8
+- EMA momentum：m=0.5
 
 每次收到同一个样本对应的多条 reward 后，先计算该批次的平均正确率：
 
@@ -277,7 +277,7 @@ Beta=0 专项分析对预先列出的 7 组比较进行 Holm 多重检验校正�
 
 ## 6. 项目结构
 
-建议 GitHub 仓库采用以下结构：
+ GitHub 仓库采用以下结构：
 
 ```text
 Qwen2.5-1.5B-GRPO-Dynamic-Sampling/
@@ -296,10 +296,6 @@ Qwen2.5-1.5B-GRPO-Dynamic-Sampling/
         ├── disagreements.jsonl
         └── beta0_ablation_disagreements.jsonl
 ```
-
-原始逐题预测文件（`base.jsonl`、`grpo_1epoch.jsonl` 等）可以单独放在 `results/predictions/`。这些文件可能较大，是否提交到 GitHub 取决于仓库体积和公开数据需求。
-
-当前截图中，`output/` 与 `QWEN-1.5B-INSTRUCT-GRPO/` 是同级目录。如果 Git 仓库只初始化在 `QWEN-1.5B-INSTRUCT-GRPO/` 内，外层 `output/` 不会自动被 Git 纳入。若要提交分析结果，请先将需要公开的 CSV 和 JSONL 复制到仓库内部的 `results/` 目录。
 
 ## 7. 运行方式
 
@@ -406,6 +402,7 @@ python ANALYSIS.py
 - 记录每个训练阶段的样本采样频率、difficulty 和 reward 变化。
 - 增加 paired bootstrap，计算模型 Accuracy Difference 的 95% 置信区间。
 - 分析动态采样改善和退化的具体题目类型，研究是否存在能力偏置。
+- 增加对不同训练方法得到模型的PASS@K检验
 
 ## 10. License and Citation
 
