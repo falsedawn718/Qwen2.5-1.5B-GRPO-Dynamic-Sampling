@@ -280,21 +280,31 @@ Beta=0 专项分析对预先列出的 7 组比较进行 Holm 多重检验校正�
  GitHub 仓库采用以下结构：
 
 ```text
-Qwen2.5-1.5B-GRPO-Dynamic-Sampling/
+QWEN-1.5B-INSTRUCT-GRPO/
+│
 ├── README.md
+├── .gitignore
 ├── ANALYSIS.py
 ├── evaluate.py
+├── utils.py
 ├── train_ordinary.py
 ├── train_difficulty_sampling.py
 ├── train_difficulty_sampling_beta0.py
-├── utils.py
-└── results/
-    └── analysis/
-        ├── model_summary.csv
-        ├── pairwise_comparison.csv
-        ├── beta0_ablation_summary.csv
-        ├── disagreements.jsonl
-        └── beta0_ablation_disagreements.jsonl
+├── results/
+│   ├── predictions/
+│   │   ├── base.jsonl
+│   │   ├── grpo_1epoch.jsonl
+│   │   ├── grpo_2epoch.jsonl
+│   │   ├── dynamic_grpo_1epoch.jsonl
+│   │   ├── dynamic_grpo_2epoch.jsonl
+│   │   ├── grpo_beta0_1epoch.jsonl
+│   │   └── grpo_beta0_2epoch.jsonl
+│   └── analysis/
+│       ├── model_summary.csv
+│       ├── pairwise_comparison.csv
+│       ├── beta0_ablation_summary.csv
+│       ├── disagreements.jsonl
+│       └── beta0_ablation_disagreements.jsonl
 ```
 
 ## 7. 运行方式
