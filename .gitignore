@@ -1,0 +1,11 @@
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+venv/
+wandb/
+checkpoint-*/
+checkpoints/
+model/
+*.safetensors
+*.pt
+*.pth
