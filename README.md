@@ -45,46 +45,46 @@
 
 初始化设置：
 
-- 初始正确率估计：\(p_i=0.5\)
-- 初始采样计数：\(counts_i=0\)
-- 生成数量：\(G=8\)
-- EMA momentum：\(m=0.5\)
+- 初始正确率估计：$p_i=0.5$
+- 初始采样计数：$counts_i=0$
+- 生成数量：$G=8$
+- EMA momentum：$m=0.5$
 
 每次收到同一个样本对应的多条 reward 后，先计算该批次的平均正确率：
 
-\[
+$$
 \bar r_i=\frac{1}{K_i}\sum_{j=1}^{K_i}r_{i,j}
-\]
+$$
 
 再通过指数移动平均更新：
 
-\[
+$$
 p_i\leftarrow(1-m)p_i+m\bar r_i
-\]
+$$
 
 同时更新：
 
-\[
+$$
 counts_i\leftarrow counts_i+1
-\]
+$$
 
-其中 \(r_{i,j}\in\{0,1\}\)。
+其中 $r_{i,j}\in\{0,1\}$。
 
 ### 2.3 难度权重
 
 代码使用以下公式估计样本难度：
 
-\[
+$$
 difficulty_i=1-p_i^G-(1-p_i)^G
-\]
+$$
 
-其中 \(G\) 是每个 prompt 的生成数量，当前实现为 8。
+其中 $G$ 是每个 prompt 的生成数量，当前实现为 8。
 
-该表达式可以理解为：假设同一题目的每次生成正确概率近似为 \(p_i\)，那么：
+该表达式可以理解为：假设同一题目的每次生成正确概率近似为 $p_i$，那么：
 
-\[
+$$
 p_i^G+(1-p_i)^G
-\]
+$$
 
 对应 G 次生成全部正确或全部错误的概率。因此，`difficulty` 衡量一组生成中同时出现正确与错误结果的倾向。
 
@@ -94,26 +94,26 @@ p_i^G+(1-p_i)^G
 
 最终采样权重为：
 
-\[
+$$
 w_i=
 \frac{difficulty_i+\epsilon}
 {\left(1+\frac{counts_i}{\tau}\right)^\beta}
-\]
+$$
 
 当前实现中：
 
-- \(\epsilon=10^{-6}\)
-- \(\tau=4\)
-- Dynamic GRPO：\(\beta=0.8\)
-- Beta=0 消融：\(\beta=0\)
+- $\epsilon=10^{-6}$
+- $\tau=4$
+- Dynamic GRPO：$\beta=0.8$
+- Beta=0 消融：$\beta=0$
 
-当 \(\beta=0.8\) 时，采样次数越多，惩罚项越大，样本权重相应降低。
+当 $\beta=0.8$ 时，采样次数越多，惩罚项越大，样本权重相应降低。
 
-当 \(\beta=0\) 时：
+当 $\beta=0$ 时：
 
-\[
+$$
 w_i=difficulty_i+10^{-6}
-\]
+$$
 
 因此，Beta=0 实验仍然根据 `difficulty` 动态调整采样概率，只是不再惩罚历史上被采样次数较多的样本。
 
@@ -149,10 +149,10 @@ w_i=difficulty_i+10^{-6}
 | Per-device eval batch size | 8 |
 | vLLM | Enabled |
 | Difficulty EMA momentum | 0.5 |
-| Difficulty generations \(G\) | 8 |
-| Frequency penalty \(\tau\) | 4 |
-| Dynamic \(\beta\) | 0.8 |
-| Ablation \(\beta\) | 0 |
+| Difficulty generations $G$ | 8 |
+| Frequency penalty $\tau$ | 4 |
+| Dynamic $\beta$ | 0.8 |
+| Ablation $\beta$ | 0 |
 
 训练集来自 GSM8K `train` split，并通过 `train_test_split(test_size=0.01, seed=42)` 划分训练集和验证集。最终测试使用 GSM8K `test` split，共 1319 道题。
 
@@ -186,19 +186,19 @@ w_i=difficulty_i+10^{-6}
 
 **Accuracy**
 
-\[
+$$
 Accuracy=\frac{\text{Correct}}{\text{Total}}
-\]
+$$
 
 提取失败的答案按错误计入总准确率。
 
 **Conditional Accuracy**
 
-\[
+$$
 Conditional\ Accuracy=
 \frac{\text{Correct}}
 {\text{Total}-\text{Extraction Failures}}
-\]
+$$
 
 它表示答案成功提取的样本中的准确率，不能替代总 Accuracy。
 
@@ -243,7 +243,7 @@ Beta=0 专项分析对预先列出的 7 组比较进行 Holm 多重检验校正�
 | GRPO 2E → Dynamic 2E | +1.440 pp | 0.1973 |
 | Dynamic 1E → Dynamic 2E | +0.986 pp | 0.3902 |
 
-这些结果中，Dynamic 版本的观测准确率高于对应的普通 GRPO 版本，但配对检验均未达到 \(p<0.05\)。
+这些结果中，Dynamic 版本的观测准确率高于对应的普通 GRPO 版本，但配对检验均未达到 $p<0.05$。
 
 ### 5.3 Beta=0 消融结果
 
@@ -273,7 +273,7 @@ Beta=0 专项分析对预先列出的 7 组比较进行 Holm 多重检验校正�
 1. Wilson CI 是单模型准确率区间；模型之间的差异应优先结合配对检验分析。
 2. McNemar 检验不显著不代表两个模型完全相同，只表示当前数据不足以拒绝准确率无差异的原假设。
 3. 当前结果来自同一 GSM8K test split。若要增强结论，应进行多个随机种子的重复训练，并报告均值、标准差及跨种子差异。
-4. Beta=0 对照应确保除 \(\beta\) 外的训练设置、随机种子、训练步数和评测流程一致，才能更有力地将差异归因于 frequency penalty。
+4. Beta=0 对照应确保除 $\beta$ 外的训练设置、随机种子、训练步数和评测流程一致，才能更有力地将差异归因于 frequency penalty。
 
 ## 6. 项目结构
 
@@ -401,8 +401,8 @@ python ANALYSIS.py
 ## 9. 后续改进方向
 
 - 使用多个随机种子重复训练，评估动态采样收益的稳定性。
-- 增加不同 \(\beta\) 值的网格实验，例如 0、0.4、0.8、1.2。
-- 对比不同 \(\tau\) 和 EMA momentum。
+- 增加不同 $\beta$ 值的网格实验，例如 0、0.4、0.8、1.2。
+- 对比不同 $\tau$ 和 EMA momentum。
 - 记录每个训练阶段的样本采样频率、difficulty 和 reward 变化。
 - 增加 paired bootstrap，计算模型 Accuracy Difference 的 95% 置信区间。
 - 分析动态采样改善和退化的具体题目类型，研究是否存在能力偏置。
